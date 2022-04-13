@@ -19,6 +19,7 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 	private Board board;
 	private JButton start;
 	private JButton clear;
+	private JButton changeNeighborhood;
 	private JComboBox<Integer> drawType;
 	private JSlider pred;
 	private JFrame frame;
@@ -57,10 +58,15 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 		drawType.addActionListener(this);
 		drawType.setActionCommand("drawType");
 
+		changeNeighborhood = new JButton("current: Moore");
+		changeNeighborhood.setActionCommand("changeNeighborhood");
+		changeNeighborhood.addActionListener(this);
+
 		buttonPanel.add(start);
 		buttonPanel.add(clear);
 		buttonPanel.add(drawType);
 		buttonPanel.add(pred);
+		buttonPanel.add(changeNeighborhood);
 
 		board = new Board(1024, 768 - buttonPanel.getHeight());
 		container.add(board, BorderLayout.CENTER);
@@ -88,6 +94,7 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 			} else if (command.equals("clear")) {
 				iterNum = 0;
 				timer.stop();
+				start.setText("Start");
 				start.setEnabled(true);
 				board.clear();
 				frame.setTitle("Cellular Automata Toolbox");
@@ -96,7 +103,23 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 				int newType = (Integer)drawType.getSelectedItem();
 				board.editType = newType;
 			}
+			else if (command.equals("changeNeighborhood"))
+			{
+				iterNum = 0;
+				timer.stop();
+				start.setText("Start");
+				start.setEnabled(true);
+				board.clear();
+				frame.setTitle("Cellular Automata Toolbox");
 
+				board.isMoore = !board.isMoore;
+				if (board.isMoore)
+					changeNeighborhood.setText("current: Moore");
+				else
+					changeNeighborhood.setText("current: von Neumann");
+
+				board.setNeighborhood();
+			}
 		}
 	}
 

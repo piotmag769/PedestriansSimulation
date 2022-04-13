@@ -13,7 +13,8 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	private static final long serialVersionUID = 1L;
 	private Point[][] points;
 	private int size = 10;
-	public int editType=0;
+	public int editType = 0;
+	public boolean isMoore = true;
 
 	public Board(int length, int height) {
 		addMouseListener(this);
@@ -24,9 +25,14 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	}
 
 	public void iteration() {
+		for (var temp: points)
+			for (var point: temp)
+				point.blocked = false;
+
 		for (int x = 1; x < points.length - 1; ++x)
 			for (int y = 1; y < points[x].length - 1; ++y)
 				points[x][y].move();
+
 		this.repaint();
 	}
 
@@ -46,13 +52,26 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 			for (int y = 0; y < points[x].length; ++y)
 				points[x][y] = new Point();
 
-		for (int x = 1; x < points.length-1; ++x) {
-			for (int y = 1; y < points[x].length-1; ++y) {			
-			}
-		}	
+		setNeighborhood();
 	}
 	
 	private void calculateField(){
+		ArrayList<Point> toCheck = new ArrayList<>();
+		for (int x = 0; x < points.length; ++x)
+			for (int y = 0; y < points[x].length; ++y)
+				if (points[x][y].type == 2) //exit
+				{
+					points[x][y].staticField = 0;
+					toCheck.addAll(points[x][y].neighbors);
+				}
+
+		while(toCheck.size() != 0)
+		{
+			Point temp = toCheck.get(0);
+			if(temp.calcStaticField())
+				toCheck.addAll(temp.neighbors);
+			toCheck.remove(temp);
+		}
 	}
 
 	protected void paintComponent(Graphics g) {
@@ -166,4 +185,24 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	public void mousePressed(MouseEvent e) {
 	}
 
+	public void setNeighborhood()
+	{
+		for (int x = 1; x < points.length-1; ++x) {
+			for (int y = 1; y < points[x].length-1; ++y) {
+				// von Neumann neighborhood
+				points[x][y].neighbors.clear();
+				points[x][y].addNeighbor(points[x][y + 1]);
+				points[x][y].addNeighbor(points[x + 1][y]);
+				points[x][y].addNeighbor(points[x][y - 1]);
+				points[x][y].addNeighbor(points[x - 1][y]);
+				if(isMoore)
+				{
+					points[x][y].addNeighbor(points[x + 1][y + 1]);
+					points[x][y].addNeighbor(points[x + 1][y - 1]);
+					points[x][y].addNeighbor(points[x - 1][y + 1]);
+					points[x][y].addNeighbor(points[x - 1][y - 1]);
+				}
+			}
+		}
+	}
 }
