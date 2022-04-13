@@ -53,6 +53,7 @@ public class Point {
 			if(dest != null)
 			{
 				isPedestrian = false;
+				// if someone enters exit nobody can do that in the same iteration
 				dest.blocked = true;
 				if (dest.type != 2)
 					dest.isPedestrian = true;
